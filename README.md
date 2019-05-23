@@ -51,56 +51,6 @@ or anything else you would look to do but didn't have time)
 
 Once you have completed your work, send us a link to your public repository.
 
+
+
 Good luck!
-
-
-//santizing input
-//namespace
-//protected class
-//iaccountservice or imoneyboxservice: withdraw(from) and transfer money(from,to), in exec u call service methods: Balance()
-//add comments
-//update readme
-
-martin fowler: domain modal : never put business logic into domain model, put it into service layer or reposit
-
-this is the order:
-data
-domain
-service layer will have relationship with respos. and put bal, logic in here
-service layer mediates comms between controller and repository layer. service layer contains business logic, and validation logic
-
-controllers respon for app flow control logic
-
-
-public class MyEntity
-{
-    private int someProperty = 0;
-
-    public int SomeProperty
-    {
-        get { return this.someProperty; }
-        set
-        {
-            string message;
-            if(!TryValidateSomeProperty(value, out message)) 
-            {
-                throw new ArgumentOutOfRangeException("value", message);
-            }
-            this.someProperty = value;
-        }
-    }
-
-    public static bool TryValidateSomeProperty(int value, out string message)
-    {
-        if(value < 0)
-        {
-            message = "Some Property cannot be negative.";
-            return false;
-        }
-        message = string.Empty;
-        return true;
-    }
-}
-https://www.martinfowler.com/bliki/AnemicDomainModel.html
-https://softwareengineering.stackexchange.com/questions/218011/how-accurate-is-business-logic-should-be-in-a-service-not-in-a-model
-https://softwareengineering.stackexchange.com/questions/218011/how-accurate-is-business-logic-should-be-in-a-service-not-in-a-model/218394#218394
