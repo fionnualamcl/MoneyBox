@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Moneybox.App.Domain;
+using System;
 
 namespace Moneybox.App
 {
@@ -9,5 +10,14 @@ namespace Moneybox.App
         public string Name { get; set; }
 
         public string Email { get; set; }
+
+        public Address Address { get; set; }
+
+        public Boolean IsDisabled { get; set; }
+
+        public Boolean IsUserDisabled()
+        {
+            return this.IsDisabled;
+        }
     }
 }

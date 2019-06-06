@@ -9,15 +9,11 @@ namespace Moneybox.App.Features
     {
         private IAccountRepository _accountRepository;
         private INotificationService _notificationService;
-        private IAccountService _accountService;
 
-        private Validator _validator = new Validator();
-
-        public WithdrawMoney(IAccountRepository accountRepository, INotificationService notificationService, IAccountService accountService)
+        public WithdrawMoney(IAccountRepository accountRepository, INotificationService notificationService)
         {
             this._accountRepository = accountRepository;
             this._notificationService = notificationService;
-            this._accountService = accountService; 
         }
 
         public Account Execute(Guid fromAccountId, decimal amount)
@@ -28,40 +24,46 @@ namespace Moneybox.App.Features
                 throw new InvalidOperationException("Account:" + fromAccountId.ToString() + " was not found. Please contact your system administrator.");
             }
 
+            if (!PerformValidation(amount, from)) {
+                throw new InvalidOperationException("Insuffient funds.");
+            }
+
+            from.CalculateWithdrawBalance(amount);
+
+            _accountRepository.Update(from);
+
+            return from;
+        }
+
+        private Boolean PerformValidation(decimal amount, Account from)
+        {
             if (amount < 0m)
             {
                 throw new InvalidOperationException("The amount entered(" + amount + ") is a negative number");
             }
 
-            var balanceIsExceeded = this._validator.IsBelowMinimumBalance(from, amount);
+            var balanceIsExceeded = from.IsBelowMinimumBalance(amount);
             if (balanceIsExceeded)
             {
                 throw new InvalidOperationException("Insufficient funds to make withdraw");
             }
 
-            var balanceIsZero = this._validator.IsBalanceLessThanZero(from, amount);
+            var balanceIsZero = from.IsBalanceLessThanZero(amount);
             if (balanceIsZero)
             {
-                this._notificationService.NotifyFundsLow(from.User.Email);
+                foreach (var user in from.Users)
+                {
+                    this._notificationService.NotifyFundsLow(user.Email);
+                }
+                return false;
             }
 
-            from = this._accountService.CalculateWithdrawBalance(from, amount);
-
-            // If any of the below fails then rollback both transactions
-            // Ideally use transaction scope to put it into transaction and then let it handle rollback or committing 
-            // of record into DB if it was connected to a database.
-            try
+            if (from.IsFrozen)
             {
-                this._accountRepository.Update(from);
-            }
-            catch (Exception)
-            {
-                this._accountRepository.RollBackTransaction(from);
-
-                throw;
+                throw new InvalidOperationException("Account is frozen");
             }
 
-            return from;
+            return true;
         }
     }
 }

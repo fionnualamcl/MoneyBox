@@ -27,7 +27,6 @@ namespace Moneybox.App
 
                 IAccountRepository accountRepository = new AccountRepository();
                 INotificationService notificationService = new NotificationService();
-                IAccountService accountService = new AccountService(accountRepository);
 
                 if (optionPicked.Equals("1"))
                 {
@@ -37,7 +36,7 @@ namespace Moneybox.App
 
                     amount = GetAmount();
 
-                    var transferMoney = new TransferMoney(accountRepository, notificationService, accountService);
+                    var transferMoney = new TransferMoney(accountRepository, notificationService);
 
                     var updatedAccount = transferMoney.Execute(fromAccountID, toAccountID, amount);
 
@@ -49,7 +48,7 @@ namespace Moneybox.App
 
                     amount = GetAmount();
 
-                    var withdrawMoney = new WithdrawMoney(accountRepository, notificationService, accountService);
+                    var withdrawMoney = new WithdrawMoney(accountRepository, notificationService);
 
                     var updatedAccount = withdrawMoney.Execute(fromAccountID, amount);
 

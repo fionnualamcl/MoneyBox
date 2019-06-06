@@ -7,7 +7,5 @@ namespace Moneybox.App.DataAccess
         Account GetAccountById(Guid accountId);
 
         void Update(Account account);
-
-        void RollBackTransaction(Account account);
     }
 }
